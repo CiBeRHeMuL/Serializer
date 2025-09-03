@@ -1,6 +1,6 @@
 {
   "name": "andrew-gos/serializer",
-  "description": "Advanced strictly typed Telegram Bot Library",
+  "description": "A flexible and extensible serialization library for modern PHP applications",
   "type": "library",
   "license": "MIT",
   "keywords": ["andrew-gos", "php", "serialization", "serializer", "encode"],
