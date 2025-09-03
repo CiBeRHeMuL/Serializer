@@ -1,0 +1,34 @@
+{
+  "name": "andrew-gos/serializer",
+  "description": "Advanced strictly typed Telegram Bot Library",
+  "type": "library",
+  "license": "MIT",
+  "keywords": ["andrew-gos", "php", "serialization", "serializer", "encode"],
+  "homepage": "https://github.com/CiBeRHeMuL/Serializer",
+  "autoload": {
+    "psr-4": {
+      "AndrewGos\\Serializer\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "AndrewGos\\Serializer\\Tests\\": "tests/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Andrey Gostev",
+      "email": "Gostev71@outlook.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=8.2",
+    "psr/container": "^2.0"
+  },
+  "require-dev": {
+    "ext-dom": "*",
+    "ext-libxml": "*",
+    "phpunit/phpunit": "^11"
+  }
+}
