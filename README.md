@@ -1,8 +1,10 @@
 # Andrew-Gos/Serializer
 
-[![Latest Stable Version](https://poser.pugx.org/andrew-gos/serializer/v/stable)](https://packagist.org/packages/andrew-gos/serializer)
-[![License](https://poser.pugx.org/andrew-gos/serializer/license)](https://packagist.org/packages/andrew-gos/serializer)
-<!-- TODO: Add more badges for build status, code coverage, etc. -->
+[![Latest Stable Version](http://poser.pugx.org/andrew-gos/serializer/v)](https://packagist.org/packages/andrew-gos/serializer)
+[![Total Downloads](http://poser.pugx.org/andrew-gos/serializer/downloads)](https://packagist.org/packages/andrew-gos/serializer)
+[![Latest Unstable Version](http://poser.pugx.org/andrew-gos/serializer/v/unstable)](https://packagist.org/packages/andrew-gos/serializer)
+[![License](http://poser.pugx.org/andrew-gos/serializer/license)](https://packagist.org/packages/andrew-gos/serializer)
+[![PHP Version Require](http://poser.pugx.org/andrew-gos/serializer/require/php)](https://packagist.org/packages/andrew-gos/serializer)
 
 A flexible and extensible serialization library for modern PHP applications.
 
