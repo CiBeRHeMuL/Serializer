@@ -15,7 +15,7 @@ final class ArrayNormalizer
     {
         array_walk(
             $value,
-            $this->serializer->normalize(...),
+            fn(&$value) => $value = $this->serializer->normalize($value),
         );
         return $value;
     }
