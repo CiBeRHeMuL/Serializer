@@ -11,7 +11,7 @@ final class ArrayNormalizer
     ) {
     }
 
-    public function __invoke(mixed $value): string|float|int|bool|null
+    public function __invoke(mixed $value): array
     {
         array_walk(
             $value,
