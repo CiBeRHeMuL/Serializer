@@ -4,8 +4,10 @@ namespace AndrewGos\Serializer\Container;
 
 use AndrewGos\Serializer\Container\Exception\InvalidTypeException;
 use AndrewGos\Serializer\Container\Exception\NormalizerNotFoundException;
+use BackedEnum;
 use Closure;
 use Psr\Container\ContainerInterface;
+use UnitEnum;
 
 final class NormalizerContainer implements ContainerInterface
 {
@@ -122,6 +124,18 @@ final class NormalizerContainer implements ContainerInterface
             if ($normalizer === null) {
                 $interfaces = class_implements($type);
                 foreach ($interfaces as $interface) {
+                    // If class is enum check, that where is normalizer for BackedEnum
+                    // (because for enums class_implements returns UnitEnum and BackedEnum in reverse order like [UnitEnum, BackedEnum],
+                    // so we need to check for normalizer for BackedEnum)
+                    if ($interface === UnitEnum::class && is_subclass_of($type, BackedEnum::class)) {
+                        if (isset($this->normalizers[BackedEnum::class])) {
+                            $normalizer = $this->normalizers[BackedEnum::class];
+                            break;
+                        } elseif (isset($this->normalizers[UnitEnum::class])) {
+                            $normalizer = $this->normalizers[UnitEnum::class];
+                            break;
+                        }
+                    }
                     if (isset($this->normalizers[$interface])) {
                         $normalizer = $this->normalizers[$interface];
                         break;
