@@ -9,7 +9,7 @@ use AndrewGos\Serializer\Normalizer\ScalarNormalizer;
 
 final class SerializerFactory
 {
-    public static function getDefaultSerializer(): SerializerInterface
+    public static function getDefaultSerializer(): Serializer
     {
         $serializer = new Serializer();
         $serializer->addNormalizers([
