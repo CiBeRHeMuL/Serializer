@@ -12,7 +12,7 @@ final readonly class JsonEncoder
     ) {
     }
 
-    public function __invoke(array|string|float|int|bool|null $value): string
+    public function __invoke(object|array|string|float|int|bool|null $value): string
     {
         $result = json_encode($value, $this->flags, $this->depth);
         if ($result === false) {

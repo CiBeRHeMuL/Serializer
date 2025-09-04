@@ -15,15 +15,15 @@ interface SerializerInterface
     /**
      * @param mixed $data
      *
-     * @return array|string|float|int|bool|null
+     * @return object|array|string|float|int|bool|null
      */
-    public function normalize(mixed $data): array|string|float|int|bool|null;
+    public function normalize(mixed $data): object|array|string|float|int|bool|null;
 
     /**
-     * @param array|string|float|int|bool|null $data
+     * @param object|array|string|float|int|bool|null $data
      * @param string $format
      *
      * @return string
      */
-    public function encode(array|string|float|int|bool|null $data, string $format): string;
+    public function encode(object|array|string|float|int|bool|null $data, string $format): string;
 }

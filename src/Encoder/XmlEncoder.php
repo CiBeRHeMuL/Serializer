@@ -4,7 +4,7 @@ namespace AndrewGos\Serializer\Encoder;
 
 final readonly class XmlEncoder
 {
-    public function __invoke(array|string|float|int|bool|null $data): string
+    public function __invoke(object|array|string|float|int|bool|null $data): string
     {
         $references = [];
         $referencesCode = [];
@@ -24,15 +24,16 @@ $encodedValue
 XML;
     }
 
-    private function encodeValue(array|string|float|int|bool|null &$data, array &$references, array &$referencesCode): string
+    private function encodeValue(object|array|string|float|int|bool|null &$data, array &$references, array &$referencesCode): string
     {
-        return match(get_debug_type($data)) {
-            'null' => $this->encodeNull($data),
-            'bool' => $this->encodeBool($data),
-            'int' => $this->encodeInt($data),
-            'float' => $this->encodeFloat($data),
+        return match(gettype($data)) {
+            'NULL' => $this->encodeNull($data),
+            'boolean' => $this->encodeBool($data),
+            'integer' => $this->encodeInt($data),
+            'double' => $this->encodeFloat($data),
             'string' => $this->encodeString($data),
             'array' => $this->encodeArray($data, $references, $referencesCode),
+            'object' => $this->encodeObject($data, $references, $referencesCode),
         };
     }
 
@@ -85,6 +86,30 @@ XML;
                 $referenceCode .= "<item key=\"$key\">{$this->encodeValue($value, $references, $referencesCode)}</item>";
             }
             $referenceCode .= '</array>';
+            $referencesCode[$refKey] = $referenceCode;
+        }
+        return "<reference key=\"$refKey\"/>";
+    }
+
+    private function encodeObject(object &$data, array &$references, array &$referencesCode): string
+    {
+        $refKey = uniqid();
+        foreach ($references as $key => &$reference) {
+            if (is_object($reference)) {
+                if (spl_object_id($reference) === spl_object_id($data)) {
+                    $refKey = $key;
+                    break;
+                }
+            }
+        }
+        if (!isset($references[$refKey])) {
+            $references[$refKey] = &$data;
+            $referenceCode = '<object>';
+            foreach ((array)$data as $key => &$value) {
+                $key = htmlspecialchars((string)$key, ENT_XML1, 'UTF-8');
+                $referenceCode .= "<property name=\"$key\">{$this->encodeValue($value, $references, $referencesCode)}</property>";
+            }
+            $referenceCode .= '</object>';
             $referencesCode[$refKey] = $referenceCode;
         }
         return "<reference key=\"$refKey\"/>";

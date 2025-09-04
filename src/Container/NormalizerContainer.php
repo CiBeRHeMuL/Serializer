@@ -14,6 +14,7 @@ final class NormalizerContainer implements ContainerInterface
         'float',
         'int',
         'bool',
+        'null',
     ];
 
     final public const SCALAR_TYPES_REGEX = '^(?:string|float|int|bool|scalar)$';
@@ -28,7 +29,7 @@ final class NormalizerContainer implements ContainerInterface
      * The key is a string representing the type name, and the value is a normalizer function
      * that returns either an array or a scalar value (string, float, int, bool, or null).
      *
-     * @var array<string, Closure(mixed): array|string|float|int|bool|null>
+     * @var array<string, Closure(mixed): (object|array|string|float|int|bool|null)>
      */
     private array $normalizers = [];
     private string $typeRegex;
@@ -41,7 +42,7 @@ final class NormalizerContainer implements ContainerInterface
     /**
      * @inheritDoc
      *
-     * @return Closure(mixed): array|string|float|int|bool|null
+     * @return Closure(mixed): (object|array|string|float|int|bool|null)
      */
     public function get(string $id): Closure
     {
@@ -62,7 +63,7 @@ final class NormalizerContainer implements ContainerInterface
 
     /**
      * @param string $type
-     * @param Closure(mixed): array|string|float|int|bool|null $normalizer
+     * @param Closure(mixed): (object|array|string|float|int|bool|null) $normalizer
      *
      * @return $this
      */
@@ -82,7 +83,7 @@ final class NormalizerContainer implements ContainerInterface
     }
 
     /**
-     * @param array<string, Closure(mixed): array|string|float|int|bool|null> $normalizers
+     * @param array<string, Closure(mixed): (object|array|string|float|int|bool|null)> $normalizers
      *
      * @return self
      */
@@ -103,7 +104,7 @@ final class NormalizerContainer implements ContainerInterface
 
         $normalizer = null;
 
-        // Handle scalar types (NOT NULL!!).
+        // Handle scalar types (NULL TOO!!!).
         if (in_array($type, self::SCALAR_TYPES, true)) {
             $normalizer = $this->normalizers['scalar'] ?? null;
         } elseif (class_exists($type) || interface_exists($type)) {

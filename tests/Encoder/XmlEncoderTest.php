@@ -6,6 +6,7 @@ use AndrewGos\Serializer\Encoder\XmlEncoder;
 use DOMDocument;
 use DOMXPath;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class XmlEncoderTest extends TestCase
 {
@@ -101,6 +102,87 @@ class XmlEncoderTest extends TestCase
         $finalRefKey = $xpath->query('.//reference', $ref3)->item(0)->attributes->getNamedItem('key')->nodeValue;
         $this->assertSame(
             $ref2->attributes->getNamedItem('key')->nodeValue,
+            $finalRefKey,
+            'The recursion loop is not closed correctly',
+        );
+    }
+
+    public function testSimpleObject(): void
+    {
+        $data = (object)['a' => 1, 'b' => 'test', 'c' => true, 'd' => null];
+        $xml = ($this->encoder)($data);
+
+        $dom = new DOMDocument();
+        $dom->loadXML($xml);
+        $xpath = new DOMXPath($dom);
+
+        $this->assertSame('1', $xpath->query('/root/references/reference/object/property[@name="a"]/int')->item(0)->nodeValue);
+        $this->assertSame('test', $xpath->query('/root/references/reference/object/property[@name="b"]/string')->item(0)->nodeValue);
+        $this->assertSame('1', $xpath->query('/root/references/reference/object/property[@name="c"]/bool')->item(0)->nodeValue);
+        $this->assertNotNull($xpath->query('/root/references/reference/object/property[@name="d"]/null')->item(0));
+    }
+
+    public function testSelfReferencingObject(): void
+    {
+        $data = (object)['a' => 1];
+        $data->a = &$data;
+
+        $xml = ($this->encoder)($data);
+
+        $dom = new DOMDocument();
+        $dom->loadXML($xml);
+        $xpath = new DOMXPath($dom);
+
+        $references = $xpath->query('/root/references/reference');
+        $this->assertEquals(1, $references->length);
+
+        $dataRef = $xpath->query('/root/data/reference');
+        $this->assertEquals(1, $dataRef->length);
+
+        $refKey = $dataRef->item(0)->attributes->getNameditem('key')->nodeValue;
+        $referenceKey = $references->item(0)->attributes->getNameditem('key')->nodeValue;
+        $this->assertSame($refKey, $referenceKey);
+
+        $innerRef = $xpath->query('/root/references/reference/object/property/reference');
+        $this->assertEquals(1, $innerRef->length);
+        $this->assertSame(
+            $references->item(0)->attributes->getNameditem('key')->nodeValue,
+            $innerRef->item(0)->attributes->getNameditem('key')->nodeValue,
+        );
+    }
+
+    public function testMutualRecursionObjects(): void
+    {
+        $arr1 = new stdClass();
+        $arr2 = (object)['b' => &$arr1];
+        $arr1->a = &$arr2;
+
+        $xml = ($this->encoder)($arr1);
+
+        $dom = new DOMDocument();
+        $dom->loadXML($xml);
+        $xpath = new DOMXPath($dom);
+
+        $references = $xpath->query('/root/references/reference');
+        $this->assertEquals(2, $references->length);
+
+        $dataRef = $xpath->query('/root/data/reference');
+        $this->assertEquals(1, $dataRef->length);
+
+        $refKeyInData = $dataRef->item(0)->attributes->getNameditem('key')->nodeValue;
+
+        $ref1 = $xpath->query('/root/references/reference[@key="' . $refKeyInData . '"]')->item(0);
+        $this->assertNotNull($ref1, 'Reference for data not found');
+
+        $innerRefKey = $xpath->query('.//reference', $ref1)->item(0)->attributes->getNameditem('key')->nodeValue;
+        $this->assertNotSame($refKeyInData, $innerRefKey, 'Inner reference should point to another reference');
+
+        $ref2 = $xpath->query('/root/references/reference[@key="' . $innerRefKey . '"]')->item(0);
+        $this->assertNotNull($ref2, 'The second reference in recursion not found');
+
+        $finalRefKey = $xpath->query('.//reference', $ref2)->item(0)->attributes->getNameditem('key')->nodeValue;
+        $this->assertSame(
+            $refKeyInData,
             $finalRefKey,
             'The recursion loop is not closed correctly',
         );

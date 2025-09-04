@@ -4,6 +4,7 @@ namespace AndrewGos\Serializer;
 
 use AndrewGos\Serializer\Container\EncoderContainer;
 use AndrewGos\Serializer\Container\NormalizerContainer;
+use AndrewGos\Serializer\Normalizer\ArrayNormalizer;
 use Closure;
 use Psr\Container\ContainerInterface;
 
@@ -20,7 +21,7 @@ class Serializer implements SerializerInterface
 
     /**
      * @param string $type
-     * @param Closure(mixed): (array|string|float|int|bool|null) $normalizer
+     * @param Closure(mixed): (object|array|string|float|int|bool|null) $normalizer
      *
      * @return $this
      */
@@ -31,7 +32,7 @@ class Serializer implements SerializerInterface
     }
 
     /**
-     * @param array<string, Closure(mixed): (array|string|float|int|bool|null)> $normalizers
+     * @param array<string, Closure(mixed): (object|array|string|float|int|bool|null)> $normalizers
      *
      * @return self
      */
@@ -43,7 +44,7 @@ class Serializer implements SerializerInterface
 
     /**
      * @param string $format
-     * @param Closure(array|string|float|int|bool|null): string $encoder
+     * @param Closure(object|array|string|float|int|bool|null): string $encoder
      *
      * @return self
      */
@@ -54,7 +55,7 @@ class Serializer implements SerializerInterface
     }
 
     /**
-     * @param array<string, Closure(array|string|float|int|bool|null): string> $encoders
+     * @param array<string, Closure(object|array|string|float|int|bool|null): string> $encoders
      *
      * @return self
      */
@@ -69,13 +70,24 @@ class Serializer implements SerializerInterface
         return $this->encode($this->normalize($data), $format);
     }
 
-    public function normalize(mixed $data): array|string|float|int|bool|null
+    public function normalize(mixed $data): object|array|string|float|int|bool|null
     {
-        $normalizer = $this->normalizersContainer->get(get_debug_type($data));
-        return $normalizer($data);
+        if (is_array($data)) {
+            if ($this->normalizersContainer->has('array')) {
+                $normalizer = $this->normalizersContainer->get('array');
+                return $normalizer($data);
+            } else {
+                $arrayNormalizer = new ArrayNormalizer($this);
+                $this->normalizersContainer->addNormalizer('array', $arrayNormalizer(...));
+                return $arrayNormalizer($data);
+            }
+        } else {
+            $normalizer = $this->normalizersContainer->get(get_debug_type($data));
+            return $normalizer($data);
+        }
     }
 
-    public function encode(float|int|bool|array|string|null $data, string $format): string
+    public function encode(object|float|int|bool|array|string|null $data, string $format): string
     {
         $encoder = $this->encodersContainer->get($format);
         return $encoder($data);

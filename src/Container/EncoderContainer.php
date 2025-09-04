@@ -9,14 +9,14 @@ use Psr\Container\ContainerInterface;
 final class EncoderContainer implements ContainerInterface
 {
     /**
-     * @var array<string, Closure(array|string|float|int|bool|null): string>
+     * @var array<string, Closure(object|array|string|float|int|bool|null): string>
      */
     private array $encoders = [];
 
     /**
      * @param string $id
      *
-     * @return Closure(array|string|float|int|bool|null): string
+     * @return Closure(object|array|string|float|int|bool|null): string
      */
     public function get(string $id): Closure
     {
@@ -30,7 +30,7 @@ final class EncoderContainer implements ContainerInterface
 
     /**
      * @param string $format
-     * @param Closure(array|string|float|int|bool|null): string $encoder
+     * @param Closure(object|array|string|float|int|bool|null): string $encoder
      *
      * @return self
      */
@@ -41,7 +41,7 @@ final class EncoderContainer implements ContainerInterface
     }
 
     /**
-     * @param array<string, Closure(array|string|float|int|bool|null): string> $encoders
+     * @param array<string, Closure(object|array|string|float|int|bool|null): string> $encoders
      *
      * @return self
      */
