@@ -82,7 +82,12 @@ class Serializer implements SerializerInterface
                 return $arrayNormalizer($data);
             }
         } else {
-            $normalizer = $this->normalizersContainer->get(get_debug_type($data));
+            // For anonymous classes `get_debug_type` will return 'class@anonymous', so we must get real class with `get_class`
+            $debugType = get_debug_type($data);
+            $debugType = $debugType === 'class@anonymous'
+                ? get_class($data)
+                : $debugType;
+            $normalizer = $this->normalizersContainer->get($debugType);
             return $normalizer($data);
         }
     }

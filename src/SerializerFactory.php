@@ -15,7 +15,7 @@ final class SerializerFactory
         $serializer->addNormalizers([
             'scalar' => (new ScalarNormalizer())(...),
             '*' => fn(mixed $value) => $value,
-            'object' => fn(object $value) => $serializer->normalize((array)$value),
+            'object' => fn(object $value) => $serializer->normalize(get_object_vars($value)),
             'array' => (new ArrayNormalizer($serializer))(...),
         ]);
         $serializer->addEncoders([

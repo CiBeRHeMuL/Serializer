@@ -138,6 +138,25 @@ class SerializerTest extends TestCase
         $this->assertSame($this->serializer, $result);
     }
 
+    public function testDefaultObjectNormalizer(): void
+    {
+        $this
+            ->serializer
+            ->addNormalizer(
+                'object',
+                get_object_vars(...),
+            )
+            ->addEncoder('json', (new JsonEncoder())(...));
+
+        $object = new class() {
+            public string $name = 'John';
+            public int $age = 30;
+            private string $secret = 'hidden';
+        };
+
+        $this->assertSame($this->serializer->serialize($object, 'json'), '{"name":"John","age":30}');
+    }
+
     protected function setUp(): void
     {
         $this->serializer = new Serializer();

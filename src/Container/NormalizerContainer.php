@@ -142,6 +142,9 @@ final class NormalizerContainer implements ContainerInterface
                     }
                 }
             }
+
+            // Fallback to the object normalizer for objects
+            $normalizer ??= $this->normalizers['object'] ?? null;
         }
 
         // Fallback to the wildcard normalizer if no specific one is found.
